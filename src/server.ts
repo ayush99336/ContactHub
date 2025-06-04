@@ -73,24 +73,28 @@ const gracefulShutdown = async () => {
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 
-// Start server
-const startServer = async () => {
-  try {
-    // Test database connection
-    await prisma.$connect();
-    console.log('Database connected successfully');
+// Start server only if not in Vercel (production) environment
+if (process.env.NODE_ENV !== 'production') {
+  const startServer = async () => {
+    try {
+      // Test database connection
+      await prisma.$connect();
+      console.log('Database connected successfully');
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
-      console.log(`🌐 Frontend GUI: http://localhost:${PORT}`);
-      console.log(`📊 Health check: http://localhost:${PORT}/health`);
-      console.log(`🔍 Identify endpoint: http://localhost:${PORT}/identify`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
+      app.listen(PORT, () => {
+        console.log(`🚀 Server is running on port ${PORT}`);
+        console.log(`🌐 Frontend GUI: http://localhost:${PORT}`);
+        console.log(`📊 Health check: http://localhost:${PORT}/health`);
+        console.log(`🔍 Identify endpoint: http://localhost:${PORT}/identify`);
+        console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      });
+    } catch (error) {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    }
+  };
 
-startServer();
+  startServer();
+}
+
+export default app;
