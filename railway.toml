@@ -1,0 +1,16 @@
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm ci && npx prisma generate && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+
+[[services]]
+name = "contacthub-app"
+envs = []
+
+[[databases]]
+name = "contacthub-postgres"

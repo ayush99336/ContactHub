@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContactHub - Identity Reconciliation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-link"></i>
+                <h1>ContactHub - Identity Reconciliation</h1>
+            </div>
+            <p class="subtitle">Test the customer contact identification API</p>
+        </header>
+
+        <main class="main-content">
+            <div class="form-section">
+                <div class="card">
+                    <h2><i class="fas fa-user-plus"></i> Identify Contact</h2>
+                    <form id="identifyForm" class="form">
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i>
+                                Email Address
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                placeholder="customer@example.com"
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber">
+                                <i class="fas fa-phone"></i>
+                                Phone Number
+                            </label>
+                            <input 
+                                type="tel" 
+                                id="phoneNumber" 
+                                name="phoneNumber" 
+                                placeholder="+1234567890"
+                                class="form-input"
+                            >
+                        </div>
+
+                        <div class="form-note">
+                            <i class="fas fa-info-circle"></i>
+                            At least one field (email or phone) must be provided
+                        </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <i class="fas fa-search"></i>
+                            Identify Contact
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card quick-tests">
+                    <h3><i class="fas fa-bolt"></i> Quick Test Scenarios</h3>
+                    <div class="test-buttons">
+                        <button class="test-btn" data-email="john@example.com" data-phone="+1234567890">
+                            New Contact
+                        </button>
+                        <button class="test-btn" data-email="john@example.com" data-phone="+0987654321">
+                            Link by Email
+                        </button>
+                        <button class="test-btn" data-email="jane@example.com" data-phone="+1234567890">
+                            Link by Phone
+                        </button>
+                        <button class="test-btn" data-email="admin@example.com" data-phone="">
+                            Email Only
+                        </button>
+                        <button class="test-btn" data-email="" data-phone="+5555555555">
+                            Phone Only
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card data-controls">
+                    <h3><i class="fas fa-database"></i> Data Management</h3>
+                    <div class="control-buttons">
+                        <button class="control-btn" id="loadAllContacts">
+                            <i class="fas fa-users"></i>
+                            Load All Contacts
+                        </button>
+                        <button class="control-btn" id="loadStats">
+                            <i class="fas fa-chart-pie"></i>
+                            Load Statistics
+                        </button>
+                        <button class="control-btn" id="loadHierarchy">
+                            <i class="fas fa-sitemap"></i>
+                            Load Hierarchy
+                        </button>
+                        <button class="control-btn secondary" id="refreshData">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="card">
+                    <h2><i class="fas fa-chart-line"></i> API Response</h2>
+                    <div id="loading" class="loading hidden">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Processing request...
+                    </div>
+                    <div id="results" class="results">
+                        <div class="placeholder">
+                            <i class="fas fa-arrow-left"></i>
+                            Submit a request to see the API response
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card stats">
+                    <h3><i class="fas fa-chart-bar"></i> Request Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalRequests">0</div>
+                            <div class="stat-label">Total Requests</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="successfulRequests">0</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="errorRequests">0</div>
+                            <div class="stat-label">Errors</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="avgResponseTime">0ms</div>
+                            <div class="stat-label">Avg Response</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="data-viewer">
+            <div class="card">
+                <h3><i class="fas fa-table"></i> Database View</h3>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="contacts">All Contacts</button>
+                    <button class="tab-btn" data-tab="stats">Statistics</button>
+                    <button class="tab-btn" data-tab="hierarchy">Hierarchy</button>
+                    <button class="tab-btn" data-tab="sql">SQL Schema</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div id="contacts-tab" class="tab-panel active">
+                        <div id="contactsTable" class="data-table">
+                            <div class="table-placeholder">
+                                <i class="fas fa-database"></i>
+                                Click "Load All Contacts" to view database contents
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="stats-tab" class="tab-panel">
+                        <div id="statsView" class="stats-view">
+                            <div class="table-placeholder">
+                                <i class="fas fa-chart-pie"></i>
+                                Click "Load Statistics" to view database analytics
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="hierarchy-tab" class="tab-panel">
+                        <div id="hierarchyView" class="hierarchy-view">
+                            <div class="table-placeholder">
+                                <i class="fas fa-sitemap"></i>
+                                Click "Load Hierarchy" to view contact relationships
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="sql-tab" class="tab-panel">
+                        <div class="sql-schema">
+                            <h4>PostgreSQL Schema for Contact Relationships</h4>
+                            <pre><code>-- Contacts table with self-referencing relationship
+CREATE TABLE contacts (
+    id SERIAL PRIMARY KEY,
+    phone_number VARCHAR(50),
+    email VARCHAR(255),
+    linked_id INTEGER REFERENCES contacts(id),
+    link_precedence VARCHAR(20) NOT NULL CHECK (link_precedence IN ('primary', 'secondary')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Indexes for performance
+CREATE INDEX idx_contacts_email ON contacts(email) WHERE deleted_at IS NULL;
+CREATE INDEX idx_contacts_phone ON contacts(phone_number) WHERE deleted_at IS NULL;
+CREATE INDEX idx_contacts_linked_id ON contacts(linked_id) WHERE deleted_at IS NULL;
+CREATE INDEX idx_contacts_precedence ON contacts(link_precedence) WHERE deleted_at IS NULL;
+CREATE INDEX idx_contacts_created_at ON contacts(created_at);
+
+-- Constraints
+ALTER TABLE contacts ADD CONSTRAINT check_email_or_phone 
+    CHECK (email IS NOT NULL OR phone_number IS NOT NULL);
+
+-- Primary contacts should not have linked_id
+ALTER TABLE contacts ADD CONSTRAINT check_primary_no_link 
+    CHECK (link_precedence != 'primary' OR linked_id IS NULL);
+
+-- Secondary contacts must have linked_id
+ALTER TABLE contacts ADD CONSTRAINT check_secondary_has_link 
+    CHECK (link_precedence != 'secondary' OR linked_id IS NOT NULL);
+
+-- Recursive CTE to find all related contacts
+WITH RECURSIVE contact_tree AS (
+    -- Base case: primary contacts
+    SELECT id, phone_number, email, linked_id, link_precedence, 
+           created_at, updated_at, id as root_id, 0 as level
+    FROM contacts 
+    WHERE link_precedence = 'primary' AND deleted_at IS NULL
+    
+    UNION ALL
+    
+    -- Recursive case: secondary contacts
+    SELECT c.id, c.phone_number, c.email, c.linked_id, c.link_precedence,
+           c.created_at, c.updated_at, ct.root_id, ct.level + 1
+    FROM contacts c
+    INNER JOIN contact_tree ct ON c.linked_id = ct.id
+    WHERE c.deleted_at IS NULL
+)
+SELECT * FROM contact_tree ORDER BY root_id, level, created_at;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-docs">
+            <div class="card">
+                <h3><i class="fas fa-book"></i> API Documentation</h3>
+                <div class="api-endpoint">
+                    <div class="method post">POST</div>
+                    <div class="url">/identify</div>
+                </div>
+                <div class="api-description">
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "email": "string (optional)",
+  "phoneNumber": "string (optional)"
+}</code></pre>
+                    <h4>Response:</h4>
+                    <pre><code>{
+  "contact": {
+    "primaryContactId": number,
+    "emails": string[],
+    "phoneNumbers": string[],
+    "secondaryContactIds": number[]
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
