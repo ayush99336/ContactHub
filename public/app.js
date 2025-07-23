@@ -88,7 +88,7 @@ class IdentityReconciliation {
             this.showLoading(true);
             this.updateButtonState(true);
             
-            const response = await fetch(`${this.baseUrl}/identify`, {
+            const response = await fetch(`${this.baseUrl}/api/contacts/identify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ class IdentityReconciliation {
     async loadAllContacts() {
         try {
             this.showTabLoading('contacts');
-            const response = await fetch(`${this.baseUrl}/contacts`);
+            const response = await fetch(`${this.baseUrl}/api/contacts`);
             const data = await response.json();
             
             if (response.ok) {
@@ -289,7 +289,7 @@ class IdentityReconciliation {
     async loadStats() {
         try {
             this.showTabLoading('stats');
-            const response = await fetch(`${this.baseUrl}/stats`);
+            const response = await fetch(`${this.baseUrl}/api/contacts/stats`);
             const data = await response.json();
             
             if (response.ok) {
@@ -306,7 +306,7 @@ class IdentityReconciliation {
     async loadHierarchy() {
         try {
             this.showTabLoading('hierarchy');
-            const response = await fetch(`${this.baseUrl}/hierarchy`);
+            const response = await fetch(`${this.baseUrl}/api/contacts/hierarchy`);
             const data = await response.json();
             
             if (response.ok) {

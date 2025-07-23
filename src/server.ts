@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import routes from './routes';
 import prisma from './lib/prisma';
+import { requestLogger, corsOptions } from './middleware';
 
 // Load environment variables
 dotenv.config();
@@ -12,31 +13,62 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Security and CORS middleware
 app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
+app.use(cors(corsOptions)); // Enable CORS with options
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Request logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
+app.use(requestLogger);
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// API Routes
+// API Routes - Mount all API routes under /api prefix
 app.use('/api', routes);
 
-// Health check endpoint for deployment platforms
+// Health check endpoint for deployment platforms (legacy support)
 app.get('/health', (req, res) => {
-  res.status(200).send('OK');
+  res.status(200).json({
+    status: 'OK',
+    service: 'ContactHub Identity Reconciliation',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Routes (for backward compatibility)
-app.use('/', routes);
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Welcome to ContactHub API',
+    version: '1.0.0',
+    documentation: '/api/docs',
+    health: '/api/health',
+    frontend: req.get('host') ? `${req.protocol}://${req.get('host')}` : 'Available',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Legacy routes for backward compatibility
+app.use('/identify', (req, res, next) => {
+  req.url = '/api/contacts/identify';
+  routes(req, res, next);
+});
+
+app.use('/contacts', (req, res, next) => {
+  req.url = '/api/contacts';
+  routes(req, res, next);
+});
+
+app.use('/stats', (req, res, next) => {
+  req.url = '/api/contacts/stats';
+  routes(req, res, next);
+});
+
+app.use('/hierarchy', (req, res, next) => {
+  req.url = '/api/contacts/hierarchy';
+  routes(req, res, next);
+});
 
 // 404 handler
 app.use('*', (req, res) => {
